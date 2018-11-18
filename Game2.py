@@ -21,7 +21,7 @@ def startGame():
     faction = chooseFaction()
     print(faction[0])
     establish(faction)
-    mySoldiers = 100
+    mySoldiers = 10000
     
     location = faction[1]
     print(location)
@@ -52,6 +52,7 @@ When you pillage a town there is a chance of being ambushed.
 def chooseFaction():
     try:
         global choice
+        global faction
         choice = int(input(''' Choose a faction:
 Enter 1 or 2\n
 1. France
@@ -92,6 +93,16 @@ Welcome, Lord Nelson!\n
     ''')
 
 
+
+def youLose():
+    header("Napoleonic War Simulator")
+    print("\n You Lose!")
+    sys.exit("Try Again! Don't lose all of your soldiers.")
+    
+def youWin():
+    header("Napoleonic War Simulator")
+    print("\n You Win!")
+    sys.exit()
     
 def showMap():
     print('''
@@ -134,15 +145,21 @@ battlesWon = {"London":False,
 def battle(location,mySoldiers,theySoldiers):
     if battlesWon[location] == True:
         print("We have already taken this city")
-    
+      
+        return(0)
     elif mySoldiers >= theySoldiers and battlesWon[location] == False:
         
-        casualties = 4 * int(theySoldiers*.25)
+        casualties = 3 * int(theySoldiers*.25)
         battlesWon[location] = True
         print("Battle Won! You lost " + str(casualties) + " soldiers\n" +"We have taken " + location + "\n\n")
-        return(casualties)
+        
+        
+        if faction == "France" and location == "London" or faction == "England" and location == "Paris":
+            if battlesWon[location] == True:
+                youWin()
+                sys.exit
   
-   
+        return(casualties)
 
 
 
@@ -174,7 +191,11 @@ Soldiers = ''' + str(mySoldiers) + " Location = " + location + "\n")
         if i == "Attack":
             try:
                 mySoldiers = mySoldiers - battle(location,mySoldiers,dictionary[location])
-            except:
+                if battlesWon[location] == True:
+                    print("We have already taken this city")
+                
+                   
+            except ValueError:
                 print("You lost the battle. Come back with more soldiers")
                 mySoldiers = 0
             
@@ -187,10 +208,13 @@ Soldiers = ''' + str(mySoldiers) + " Location = " + location + "\n")
             elif random.randint(1,7) == 2 or random.randint(1,7) == 7:
                 print("You have been ambushed while pillaging!")
                 mySoldiers = mySoldiers - 15
+                if mySoldiers < 0:
+                    youLose()
             else:
                 mySoldiers = mySoldiers + random.randint(7,19)
         
-            
+        
+
         elif i == "Move":
             
             destination = input("Where would you like to move?\n")
@@ -241,6 +265,9 @@ Soldiers = ''' + str(mySoldiers) + " Location = " + location + "\n")
             
             except:
                 print("You can only move one city at a time!")
+
+       
+                    
            
             print("We are in " + location)
             
